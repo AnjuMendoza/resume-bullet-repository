@@ -21,11 +21,71 @@ html, body {
     scroll-behavior: smooth;
 }
 
+/* Sticky footer layout (fixes bottom gap) */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
 .container {
     width: min(960px, 92%);
     margin: 0 auto;
 }
 
+/* Header */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    backdrop-filter: blur(10px);
+    background: rgba(247, 248, 250, 0.78);
+    border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.brand {
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+    opacity: 0.75;
+}
+
+.nav {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav a:hover {
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+/* Hero */
 .hero {
     min-height: 72vh;
     display: grid;
@@ -124,4 +184,51 @@ h1 {
     border: 1px dashed var(--border);
     border-radius: 12px;
     padding: 16px;
+}
+
+/* Footer */
+.site-footer {
+    margin-top: 0;
+    border-top: 1px solid var(--border);
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.7));
+}
+
+.footer-inner {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.footer-inner p {
+    margin: 0;
+}
+
+.footer-inner a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s ease;
+}
+
+.footer-inner a:hover {
+    opacity: 0.75;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .header-inner,
+    .footer-inner {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 12px 0;
+    }
+
+    .nav {
+        justify-content: center;
+    }
 }
