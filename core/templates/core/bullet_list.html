@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Bullets</title>
+</head>
+<body>
+    <h1>My Resume Bullets</h1>
+
+    <ul>
+        {% for bullet in bullets %}
+            <li>
+                <strong>{{ bullet.main_category }}</strong> -
+                {{ bullet.sub_category }}:
+                {{ bullet.text }}
+            </li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
