@@ -13,13 +13,21 @@
             <a href="/" class="brand">Resume Bullet Repository</a>
             <nav class="nav">
                 <a href="#about">About</a>
-                <a href="#about">Login/Signup</a>
+                {% if user.is_authenticated %}
+                    <span class="nav-welcome">Hi, {{ user.first_name|default:user.email }}</span>
+                    <form method="post" action="{% url 'logout' %}" class="nav-form">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="#account">Login/Signup</a>
+                {% endif %}
             </nav>
         </div>
     </header>
 
     <main>
-        <section class="hero">
+        <section class="hero" id="about">
             <div class="container">
                 <div class="hero-card">
                     <span class="eyebrow">Simple • Modern • Focused</span>
@@ -28,9 +36,112 @@
                         Store, organize, and reuse your best resume bullet points in one clean place.
                     </p>
                     <div class="cta-row">
-                        <a class="btn" href="#bullets">Get Started</a>
+                        <a class="btn" href="{% if user.is_authenticated %}#bullets{% else %}#account{% endif %}">
+                            {% if user.is_authenticated %}View Bullets{% else %}Get Started{% endif %}
+                        </a>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        {% if messages %}
+            <section class="container message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <p class="message message-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% if not user.is_authenticated %}
+            <section class="section account-section" id="account">
+                <div class="container">
+                    <div class="account-grid">
+                        <article class="auth-card">
+                            <span class="eyebrow">Welcome back</span>
+                            <h2>Login</h2>
+                            <p class="form-intro">Use your email and password to return to your bullet library.</p>
+                            <form method="post" class="auth-form" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="login" />
+                                <div class="field">
+                                    <label for="{{ login_form.email.id_for_label }}">Email</label>
+                                    {{ login_form.email }}
+                                    {{ login_form.email.errors }}
+                                </div>
+                                <div class="field">
+                                    <label for="{{ login_form.password.id_for_label }}">Password</label>
+                                    {{ login_form.password }}
+                                    {{ login_form.password.errors }}
+                                </div>
+                                {{ login_form.non_field_errors }}
+                                <button type="submit" class="btn btn-full">Login</button>
+                            </form>
+                        </article>
+
+                        <article class="auth-card auth-card-accent">
+                            <span class="eyebrow">Create account</span>
+                            <h2>Sign up</h2>
+                            <p class="form-intro">Start with the essentials so every saved bullet belongs to you.</p>
+                            <form method="post" class="auth-form" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="signup" />
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label for="{{ signup_form.first_name.id_for_label }}">First name</label>
+                                        {{ signup_form.first_name }}
+                                        {{ signup_form.first_name.errors }}
+                                    </div>
+                                    <div class="field">
+                                        <label for="{{ signup_form.last_name.id_for_label }}">Last name</label>
+                                        {{ signup_form.last_name }}
+                                        {{ signup_form.last_name.errors }}
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label for="{{ signup_form.email.id_for_label }}">Email</label>
+                                    {{ signup_form.email }}
+                                    {{ signup_form.email.errors }}
+                                </div>
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label for="{{ signup_form.password.id_for_label }}">Password</label>
+                                        {{ signup_form.password }}
+                                        {{ signup_form.password.errors }}
+                                    </div>
+                                    <div class="field">
+                                        <label for="{{ signup_form.password_confirm.id_for_label }}">Confirm password</label>
+                                        {{ signup_form.password_confirm }}
+                                        {{ signup_form.password_confirm.errors }}
+                                    </div>
+                                </div>
+                                {{ signup_form.non_field_errors }}
+                                <button type="submit" class="btn btn-full">Create account</button>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="section" id="bullets">
+            <div class="container">
+                <h2>Your bullet repository</h2>
+                {% if user.is_authenticated %}
+                    {% if bullets %}
+                        <ul class="bullet-list">
+                            {% for bullet in bullets %}
+                                <li class="bullet-item">
+                                    <div class="meta">{{ bullet.get_main_category_display }} • {{ bullet.sub_category }}</div>
+                                    <div>{{ bullet.text }}</div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty">No bullets yet. Your best resume accomplishments will live here.</p>
+                    {% endif %}
+                {% else %}
+                    <p class="empty">Login or create an account to view and organize resume bullets.</p>
+                {% endif %}
             </div>
         </section>
     </main>
