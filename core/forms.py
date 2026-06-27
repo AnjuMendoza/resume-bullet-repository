@@ -4,23 +4,11 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class SignupForm(forms.Form):
-    first_name = forms.CharField(
-        max_length=150,
-        widget=forms.TextInput(attrs={'autocomplete': 'given-name', 'placeholder': 'Jane'}),
-    )
-    last_name = forms.CharField(
-        max_length=150,
-        widget=forms.TextInput(attrs={'autocomplete': 'family-name', 'placeholder': 'Doe'}),
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'placeholder': 'jane@example.com'}),
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Create a password'}),
-    )
-    password_confirm = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirm your password'}),
-    )
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    password_confirm = forms.CharField(widget=forms.PasswordInput)
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
@@ -54,12 +42,8 @@ class SignupForm(forms.Form):
 
 
 class EmailLoginForm(forms.Form):
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'placeholder': 'jane@example.com'}),
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'placeholder': 'Your password'}),
-    )
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
 
     def __init__(self, request=None, *args, **kwargs):
         self.request = request

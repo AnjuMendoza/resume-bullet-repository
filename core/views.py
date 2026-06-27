@@ -8,13 +8,6 @@ from .models import Bullet
 
 def bullet_list(request):
     bullets = Bullet.objects.all()
-    return render(request, 'bullet_list.html', {'bullets': bullets})
-
-
-def account_view(request):
-    if request.user.is_authenticated:
-        return redirect('bullet_list')
-
     login_form = EmailLoginForm(prefix='login')
     signup_form = SignupForm(prefix='signup')
 
@@ -40,8 +33,9 @@ def account_view(request):
 
     return render(
         request,
-        'account.html',
+        'bullet_list.html',
         {
+            'bullets': bullets,
             'login_form': login_form,
             'signup_form': signup_form,
         },
