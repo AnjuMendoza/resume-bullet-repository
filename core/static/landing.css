@@ -232,3 +232,146 @@ h1 {
         justify-content: center;
     }
 }
+/* Account forms */
+.message-stack {
+    margin-top: -18px;
+    margin-bottom: 28px;
+}
+
+.message {
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+.message-success {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.message-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.nav-welcome {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.nav-form {
+    margin: 0;
+}
+
+.nav-link-button {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link-button:hover {
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+.account-section {
+    padding-top: 0;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+}
+
+.auth-card-accent {
+    background: linear-gradient(145deg, #ffffff, #f9fafb);
+}
+
+.auth-card h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.form-intro {
+    margin: 10px 0 22px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.auth-form {
+    display: grid;
+    gap: 16px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.field {
+    display: grid;
+    gap: 7px;
+}
+
+.field label {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 13px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
+.errorlist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: #b91c1c;
+    font-size: 0.85rem;
+}
+
+.btn-full {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+}
+
+@media (max-width: 800px) {
+    .account-grid,
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+}
