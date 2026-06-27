@@ -13,13 +13,29 @@
             <a href="/" class="brand">Resume Bullet Repository</a>
             <nav class="nav">
                 <a href="#about">About</a>
-                <a href="#about">Login/Signup</a>
+                {% if user.is_authenticated %}
+                    <span class="nav-welcome">Hi, {{ user.first_name|default:user.email }}</span>
+                    <form method="post" action="{% url 'logout' %}" class="nav-form">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'account' %}">Login/Signup</a>
+                {% endif %}
             </nav>
         </div>
     </header>
 
     <main>
-        <section class="hero">
+        {% if messages %}
+            <section class="container message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <p class="message message-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        <section class="hero" id="about">
             <div class="container">
                 <div class="hero-card">
                     <span class="eyebrow">Simple • Modern • Focused</span>
