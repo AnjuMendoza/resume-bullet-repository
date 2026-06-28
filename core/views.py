@@ -1,10 +1,14 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import EmailLoginForm, ResumeSectionForm, SignupForm
-from .models import Bullet, ResumeSection
+from .models import ResumeSection
 
 
 def bullet_list(request):
@@ -26,12 +30,8 @@ def repository_view(request, section_id=None):
     elif sections:
         active_section = sections[0]
 
-    form = ResumeSectionForm(instance=active_section)
-    bullets = Bullet.objects.all()
     return render(request, 'repository.html', {
         'active_section': active_section,
-        'bullets': bullets,
-        'form': form,
         'sections': sections,
     })
 
@@ -48,15 +48,52 @@ def add_section(request):
 
 
 @login_required
+@require_POST
+def reorder_sections(request):
+    try:
+        section_ids = json.loads(request.body).get('section_ids', [])
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    try:
+        section_ids = [int(section_id) for section_id in section_ids]
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    user_sections = request.user.resume_sections.in_bulk(section_ids)
+
+    if len(user_sections) != len(section_ids) or len(set(section_ids)) != len(section_ids):
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    ordered_sections = []
+    for position, section_id in enumerate(section_ids):
+        section = user_sections[section_id]
+        section.position = position
+        ordered_sections.append(section)
+
+    ResumeSection.objects.bulk_update(ordered_sections, ['position'])
+    return JsonResponse({'ok': True})
+
+
+@login_required
 def update_section(request, section_id):
     section = get_object_or_404(ResumeSection, pk=section_id, user=request.user)
     if request.method == 'POST':
-        form = ResumeSectionForm(request.POST, instance=section)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Section updated.')
+        if 'notes' not in request.POST:
+            new_name = request.POST.get('name', '').strip()
+            if new_name:
+                section.name = new_name
+                section.save(update_fields=['name', 'updated_at'])
+                messages.success(request, 'Section renamed.')
+            else:
+                messages.error(request, 'Section name cannot be blank.')
         else:
-            messages.error(request, 'Please check the section details.')
+            form = ResumeSectionForm(request.POST, instance=section)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Section updated.')
+            else:
+                messages.error(request, 'Please check the section details.')
     return redirect('repository_section', section_id=section.id)
 
 
