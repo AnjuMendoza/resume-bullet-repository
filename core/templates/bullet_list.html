@@ -1,85 +1,20 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Resume Bullet Repository</title>
-    <link rel="stylesheet" href="{% static 'landing.css' %}" />
-</head>
-<body>
-    <header class="site-header">
-        <div class="container header-inner">
-            <a href="/" class="brand">Resume Bullet Repository</a>
-            <nav class="nav">
-                <a href="#about">About</a>
-                {% if user.is_authenticated %}
-                    <span class="nav-welcome">Hello {{ user.first_name|default:user.email }}</span>
-                    <form method="post" action="{% url 'logout' %}" class="nav-form">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link-button">Logout</button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'login' %}">Login</a>
-                    <a href="{% url 'signup' %}" class="nav-pill">Sign up</a>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <section class="hero" id="about">
-            <div class="container">
-                <div class="hero-card">
-                    <span class="eyebrow">Simple • Modern • Focused</span>
-                    <h1>Resume Bullet Repository</h1>
-                    <p class="subtext">
-                        Store, organize, and reuse your best resume bullet points in one clean place.
-                    </p>
-                    <div class="cta-row">
-                        <a class="btn" href="{% if user.is_authenticated %}#bullets{% else %}{% url 'signup' %}{% endif %}">
-                            {% if user.is_authenticated %}View Bullets{% else %}Get Started{% endif %}
-                        </a>
-                    </div>
-                </div>
+{% extends 'base.html' %}
+{% block title %}Resume Bullet Repository{% endblock %}
+{% block content %}
+<section class="hero" id="about">
+    <div class="container">
+        <div class="hero-card">
+            <span class="eyebrow">Simple • Modern • Focused</span>
+            <h1>Resume Bullet Repository</h1>
+            <p class="subtext">
+                Store, organize, and reuse your best resume bullet points in one clean place.
+            </p>
+            <div class="cta-row">
+                <a class="btn" href="{% if user.is_authenticated %}{% url 'repository' %}{% else %}{% url 'signup' %}{% endif %}">
+                    {% if user.is_authenticated %}View Bullets{% else %}Get Started{% endif %}
+                </a>
             </div>
-        </section>
-
-        {% if messages %}
-            <section class="container message-stack" aria-live="polite">
-                {% for message in messages %}
-                    <p class="message message-{{ message.tags }}">{{ message }}</p>
-                {% endfor %}
-            </section>
-        {% endif %}
-
-        <section class="section" id="bullets">
-            <div class="container">
-                <h2>Your bullet repository</h2>
-                {% if user.is_authenticated %}
-                    {% if bullets %}
-                        <ul class="bullet-list">
-                            {% for bullet in bullets %}
-                                <li class="bullet-item">
-                                    <div class="meta">{{ bullet.get_main_category_display }} • {{ bullet.sub_category }}</div>
-                                    <div>{{ bullet.text }}</div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="empty">No bullets yet. Your best resume accomplishments will live here.</p>
-                    {% endif %}
-                {% else %}
-                    <p class="empty"><a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">create an account</a> to view and organize resume bullets.</p>
-                {% endif %}
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <p>© 2026 Resume Bullet Repository</p>
         </div>
-    </footer>
-</body>
-</html>
+    </div>
+</section>
+{% endblock %}

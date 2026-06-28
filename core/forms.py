@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 
+from .models import ResumeSection
+
 
 class SignupForm(forms.Form):
     first_name = forms.CharField(max_length=150)
@@ -61,3 +63,13 @@ class EmailLoginForm(forms.Form):
                 raise forms.ValidationError('Enter a valid email and password.')
 
         return cleaned_data
+
+
+class ResumeSectionForm(forms.ModelForm):
+    class Meta:
+        model = ResumeSection
+        fields = ['name', 'notes']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Section name'}),
+            'notes': forms.Textarea(attrs={'rows': 8, 'placeholder': 'Add section notes, bullet order, or drafting details.'}),
+        }
