@@ -472,14 +472,8 @@ h1 {
     transition: grid-template-columns 0.2s ease;
 }
 
-.workspace-shell.is-resizing {
-    cursor: col-resize;
-    transition: none;
-    user-select: none;
-}
-
 .workspace-shell.sections-collapsed {
-    grid-template-columns: 64px 0 1fr;
+    grid-template-columns: 64px 1fr;
 }
 
 .document-tabs {
@@ -503,11 +497,7 @@ h1 {
     gap: 16px;
 }
 
-.tabs-topline {
-    justify-content: flex-end;
-    min-height: 34px;
-}
-
+.back-link,
 .icon-button,
 .collapse-tabs-button {
     border: 0;
@@ -547,6 +537,28 @@ h1 {
     justify-content: center;
 }
 
+.collapse-tabs-button {
+    border: 1px solid #d6dbe3;
+    border-radius: 999px;
+    display: grid;
+    flex: 0 0 32px;
+    font-size: 1.35rem;
+    height: 32px;
+    place-items: center;
+    width: 32px;
+}
+
+.sections-collapsed .back-link,
+.sections-collapsed .add-tab-form,
+.sections-collapsed .tabs-heading-row,
+.sections-collapsed .tab-list {
+    display: none;
+}
+
+.sections-collapsed .tabs-topline {
+    justify-content: center;
+}
+
 .add-tab-form {
     margin: 0;
 }
@@ -574,10 +586,6 @@ h1 {
 .doc-tab.active {
     background: #d7e5ff;
     color: #0f4da5;
-}
-
-.doc-tab.dragging {
-    opacity: 0.45;
 }
 
 .rename-section-form {
@@ -615,37 +623,12 @@ h1 {
     white-space: nowrap;
 }
 
-.doc-icon {
+.doc-icon,
+.doc-menu {
     color: inherit;
-    cursor: grab;
     font-size: 1.35rem;
     text-align: center;
     text-decoration: none;
-}
-
-.doc-tab:active .doc-icon {
-    cursor: grabbing;
-}
-
-.column-resizer {
-    background: transparent;
-    cursor: col-resize;
-    position: relative;
-}
-
-.column-resizer::before {
-    background: #d6dbe3;
-    content: '';
-    inset: 0 3px;
-    opacity: 0;
-    position: absolute;
-    transition: opacity 0.2s ease;
-}
-
-.column-resizer:hover::before,
-.column-resizer:focus-visible::before,
-.workspace-shell.is-resizing .column-resizer::before {
-    opacity: 1;
 }
 
 .workspace-content {

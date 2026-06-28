@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Your Bullet Repository{% endblock %}
 {% block content %}
-<section class="workspace-shell" data-workspace-shell data-reorder-url="{% url 'reorder_sections' %}">
+<section class="workspace-shell" data-workspace-shell>
     <aside class="document-tabs" aria-label="Resume sections">
         <div class="tabs-topline">
             <button type="button" class="collapse-tabs-button" aria-label="Collapse sections" aria-expanded="true" data-toggle-sections>‹</button>
@@ -13,10 +13,14 @@
                 <input type="hidden" name="name" value="Untitled section" />
                 <button type="submit" class="icon-button" aria-label="Add section">+</button>
             </form>
+            <button type="button" class="collapse-tabs-button" aria-label="Collapse sections" aria-expanded="true" data-toggle-sections>‹</button>
         </div>
-        <nav class="tab-list" data-section-list>
+        <div class="tabs-heading-row">
+            <h2>Sections</h2>
+        </div>
+        <nav class="tab-list">
             {% for section in sections %}
-                <div class="doc-tab {% if active_section.id == section.id %}active{% endif %}" draggable="true" data-section-id="{{ section.id }}">
+                <div class="doc-tab {% if active_section.id == section.id %}active{% endif %}">
                     <a class="doc-icon" href="{% url 'repository_section' section.id %}" aria-label="Open {{ section.name }}">▤</a>
                     <form method="post" action="{% url 'update_section' section.id %}" class="rename-section-form">
                         {% csrf_token %}
@@ -29,22 +33,18 @@
                             data-original-value="{{ section.name }}"
                         />
                     </form>
+                    <a class="doc-menu" href="{% url 'repository_section' section.id %}" aria-label="Open {{ section.name }}">⋮</a>
                 </div>
             {% endfor %}
         </nav>
     </aside>
 
-    <div class="column-resizer" role="separator" aria-orientation="vertical" aria-label="Resize sections column" tabindex="0" data-column-resizer></div>
     <div class="workspace-content workspace-content-blank" aria-label="Blank workspace"></div>
 </section>
 <script>
     (() => {
         const shell = document.querySelector('[data-workspace-shell]');
         const toggle = document.querySelector('[data-toggle-sections]');
-        const sectionList = document.querySelector('[data-section-list]');
-        const resizer = document.querySelector('[data-column-resizer]');
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        let draggedTab = null;
 
         if (shell && toggle) {
             toggle.addEventListener('click', () => {
@@ -58,7 +58,6 @@
         document.querySelectorAll('.doc-title-input').forEach((input) => {
             input.addEventListener('dblclick', () => {
                 input.readOnly = false;
-                input.closest('.doc-tab')?.setAttribute('draggable', 'false');
                 input.focus();
                 input.select();
             });
@@ -72,7 +71,6 @@
                 if (event.key === 'Escape') {
                     input.value = input.dataset.originalValue || input.defaultValue;
                     input.readOnly = true;
-                    input.closest('.doc-tab')?.setAttribute('draggable', 'true');
                     input.blur();
                 }
             });
@@ -84,7 +82,6 @@
 
                 const nextValue = input.value.trim();
                 const originalValue = input.dataset.originalValue || input.defaultValue;
-                input.closest('.doc-tab')?.setAttribute('draggable', 'true');
 
                 if (!nextValue) {
                     input.value = originalValue;
@@ -100,112 +97,6 @@
                 }
             });
         });
-
-        const getDragAfterElement = (container, y) => {
-            const draggableElements = [...container.querySelectorAll('.doc-tab:not(.dragging)')];
-
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset, element: child };
-                }
-
-                return closest;
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        };
-
-        const saveSectionOrder = () => {
-            if (!shell || !sectionList || !csrfToken) {
-                return;
-            }
-
-            const sectionIds = [...sectionList.querySelectorAll('.doc-tab')].map((tab) => tab.dataset.sectionId);
-
-            fetch(shell.dataset.reorderUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                },
-                body: JSON.stringify({ section_ids: sectionIds }),
-            }).catch(() => {
-                window.location.reload();
-            });
-        };
-
-        if (sectionList) {
-            sectionList.addEventListener('dragstart', (event) => {
-                const tab = event.target.closest('.doc-tab');
-
-                if (!tab || shell?.classList.contains('sections-collapsed')) {
-                    event.preventDefault();
-                    return;
-                }
-
-                draggedTab = tab;
-                tab.classList.add('dragging');
-                event.dataTransfer.effectAllowed = 'move';
-            });
-
-            sectionList.addEventListener('dragover', (event) => {
-                event.preventDefault();
-
-                if (!draggedTab) {
-                    return;
-                }
-
-                const afterElement = getDragAfterElement(sectionList, event.clientY);
-
-                if (afterElement == null) {
-                    sectionList.appendChild(draggedTab);
-                } else {
-                    sectionList.insertBefore(draggedTab, afterElement);
-                }
-            });
-
-            sectionList.addEventListener('dragend', () => {
-                if (!draggedTab) {
-                    return;
-                }
-
-                draggedTab.classList.remove('dragging');
-                draggedTab = null;
-                saveSectionOrder();
-            });
-        }
-
-        if (shell && resizer) {
-            const resizeColumn = (clientX) => {
-                const shellLeft = shell.getBoundingClientRect().left;
-                const nextWidth = Math.min(Math.max(clientX - shellLeft, 220), 520);
-                shell.style.setProperty('--sections-width', `${nextWidth}px`);
-            };
-
-            resizer.addEventListener('pointerdown', (event) => {
-                if (shell.classList.contains('sections-collapsed')) {
-                    return;
-                }
-
-                event.preventDefault();
-                resizer.setPointerCapture(event.pointerId);
-                shell.classList.add('is-resizing');
-            });
-
-            resizer.addEventListener('pointermove', (event) => {
-                if (!shell.classList.contains('is-resizing')) {
-                    return;
-                }
-
-                resizeColumn(event.clientX);
-            });
-
-            resizer.addEventListener('pointerup', (event) => {
-                resizer.releasePointerCapture(event.pointerId);
-                shell.classList.remove('is-resizing');
-            });
-        }
     })();
 </script>
 {% endblock %}
