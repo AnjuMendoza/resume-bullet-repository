@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login | Resume Bullet Repository</title>
+    <link rel="stylesheet" href="{% static 'landing.css' %}" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'bullet_list' %}" class="brand">Resume Bullet Repository</a>
+            <nav class="nav">
+                <a href="{% url 'bullet_list' %}#about">About</a>
+                <a href="{% url 'signup' %}">Sign up</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth-page-main">
+        <section class="section auth-page-section">
+            <div class="container auth-page-container">
+                {% if messages %}
+                    <div class="message-stack auth-message-stack" aria-live="polite">
+                        {% for message in messages %}
+                            <p class="message message-{{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <article class="auth-card auth-page-card">
+                    <span class="eyebrow">Welcome back</span>
+                    <h1>Login</h1>
+                    <p class="form-intro">Use your email and password to return to your bullet library.</p>
+                    <form method="post" class="auth-form" novalidate>
+                        {% csrf_token %}
+                        <div class="field">
+                            <label for="{{ form.email.id_for_label }}">Email</label>
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </div>
+                        <div class="field">
+                            <label for="{{ form.password.id_for_label }}">Password</label>
+                            {{ form.password }}
+                            {{ form.password.errors }}
+                        </div>
+                        {{ form.non_field_errors }}
+                        <button type="submit" class="btn btn-full">Login</button>
+                    </form>
+                    <p class="auth-switch">New here? <a href="{% url 'signup' %}">Create an account</a>.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© 2026 Resume Bullet Repository</p>
+        </div>
+    </footer>
+</body>
+</html>
