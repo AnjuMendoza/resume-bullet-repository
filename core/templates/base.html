@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Resume Bullet Repository{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'landing.css' %}" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="brand">Resume Bullet Repository</a>
+            <nav class="nav">
+                <a href="/#about">About</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'repository' %}">View Bullets</a>
+                    <span class="nav-welcome">Hello {{ user.first_name|default:user.email }}</span>
+                    <form method="post" action="{% url 'logout' %}" class="nav-form">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'signup' %}" class="nav-pill">Sign up</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% if messages %}
+            <section class="container message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <p class="message message-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </section>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© 2026 Resume Bullet Repository</p>
+        </div>
+    </footer>
+</body>
+</html>
