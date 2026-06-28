@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign up | Resume Bullet Repository</title>
+    <link rel="stylesheet" href="{% static 'landing.css' %}" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'bullet_list' %}" class="brand">Resume Bullet Repository</a>
+            <nav class="nav">
+                <a href="{% url 'bullet_list' %}#about">About</a>
+                <a href="{% url 'login' %}">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth-page-main">
+        <section class="section auth-page-section">
+            <div class="container auth-page-container">
+                {% if messages %}
+                    <div class="message-stack auth-message-stack" aria-live="polite">
+                        {% for message in messages %}
+                            <p class="message message-{{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <article class="auth-card auth-card-accent auth-page-card auth-page-card-wide">
+                    <span class="eyebrow">Create account</span>
+                    <h1>Sign up</h1>
+                    <p class="form-intro">Start with the essentials so every saved bullet belongs to you.</p>
+                    <form method="post" class="auth-form" novalidate>
+                        {% csrf_token %}
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="{{ form.first_name.id_for_label }}">First name</label>
+                                {{ form.first_name }}
+                                {{ form.first_name.errors }}
+                            </div>
+                            <div class="field">
+                                <label for="{{ form.last_name.id_for_label }}">Last name</label>
+                                {{ form.last_name }}
+                                {{ form.last_name.errors }}
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="{{ form.email.id_for_label }}">Email</label>
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="{{ form.password.id_for_label }}">Password</label>
+                                {{ form.password }}
+                                {{ form.password.errors }}
+                            </div>
+                            <div class="field">
+                                <label for="{{ form.password_confirm.id_for_label }}">Confirm password</label>
+                                {{ form.password_confirm }}
+                                {{ form.password_confirm.errors }}
+                            </div>
+                        </div>
+                        {{ form.non_field_errors }}
+                        <button type="submit" class="btn btn-full">Create account</button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Login</a>.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© 2026 Resume Bullet Repository</p>
+        </div>
+    </footer>
+</body>
+</html>
