@@ -78,6 +78,7 @@ def login_view(request):
     if request.method == 'POST':
         if form.is_valid():
             login(request, form.user)
+            messages.success(request, 'Welcome back!')
             return redirect('repository')
         messages.error(request, 'Please check your login details.')
 
@@ -93,6 +94,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, 'Your account is ready. Welcome!')
             return redirect('repository')
         messages.error(request, 'Please fix the signup form errors.')
 
