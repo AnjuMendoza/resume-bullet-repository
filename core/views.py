@@ -1,7 +1,11 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import EmailLoginForm, ResumeSectionForm, SignupForm
 from .models import ResumeSection
@@ -41,6 +45,34 @@ def add_section(request):
         messages.success(request, f'Added {section.name}.')
         return redirect('repository_section', section_id=section.id)
     return redirect('repository')
+
+
+@login_required
+@require_POST
+def reorder_sections(request):
+    try:
+        section_ids = json.loads(request.body).get('section_ids', [])
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    try:
+        section_ids = [int(section_id) for section_id in section_ids]
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    user_sections = request.user.resume_sections.in_bulk(section_ids)
+
+    if len(user_sections) != len(section_ids) or len(set(section_ids)) != len(section_ids):
+        return JsonResponse({'error': 'Invalid section order.'}, status=400)
+
+    ordered_sections = []
+    for position, section_id in enumerate(section_ids):
+        section = user_sections[section_id]
+        section.position = position
+        ordered_sections.append(section)
+
+    ResumeSection.objects.bulk_update(ordered_sections, ['position'])
+    return JsonResponse({'ok': True})
 
 
 @login_required

@@ -4,7 +4,10 @@
 <section class="workspace-shell" data-workspace-shell>
     <aside class="document-tabs" aria-label="Resume sections">
         <div class="tabs-topline">
-            <a class="back-link" href="{% url 'bullet_list' %}" aria-label="Back to home">←</a>
+            <button type="button" class="collapse-tabs-button" aria-label="Collapse sections" aria-expanded="true" data-toggle-sections>‹</button>
+        </div>
+        <div class="tabs-heading-row">
+            <h2>Sections</h2>
             <form method="post" action="{% url 'add_section' %}" class="add-tab-form">
                 {% csrf_token %}
                 <input type="hidden" name="name" value="Untitled section" />
