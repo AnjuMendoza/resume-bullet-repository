@@ -468,12 +468,22 @@ h1 {
     display: grid;
     grid-template-columns: minmax(260px, 340px) 1fr;
     min-height: calc(100vh - 141px);
+    transition: grid-template-columns 0.2s ease;
+}
+
+.workspace-shell.sections-collapsed {
+    grid-template-columns: 64px 1fr;
 }
 
 .document-tabs {
     background: #f3f6fb;
     border-right: 1px solid #d6dbe3;
+    overflow: hidden;
     padding: 28px 18px;
+}
+
+.sections-collapsed .document-tabs {
+    padding-inline: 10px;
 }
 
 .tabs-topline,
@@ -487,7 +497,8 @@ h1 {
 }
 
 .back-link,
-.icon-button {
+.icon-button,
+.collapse-tabs-button {
     border: 0;
     background: transparent;
     color: #454a50;
@@ -501,6 +512,28 @@ h1 {
     color: #454a50;
     font-size: 1.2rem;
     margin: 34px 0 22px;
+}
+
+.collapse-tabs-button {
+    border: 1px solid #d6dbe3;
+    border-radius: 999px;
+    display: grid;
+    flex: 0 0 32px;
+    font-size: 1.35rem;
+    height: 32px;
+    place-items: center;
+    width: 32px;
+}
+
+.sections-collapsed .back-link,
+.sections-collapsed .add-tab-form,
+.sections-collapsed .tabs-heading-row,
+.sections-collapsed .tab-list {
+    display: none;
+}
+
+.sections-collapsed .tabs-topline {
+    justify-content: center;
 }
 
 .add-tab-form {
@@ -532,6 +565,35 @@ h1 {
     color: #0f4da5;
 }
 
+.rename-section-form {
+    margin: 0;
+    min-width: 0;
+}
+
+.doc-title-input {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: inherit;
+    font: inherit;
+    padding: 4px 6px;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.doc-title-input[readonly] {
+    cursor: default;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-title-input:not([readonly]) {
+    background: #fff;
+    border-color: #9bbcf5;
+    outline: none;
+    text-transform: none;
+}
+
 .doc-title {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -540,14 +602,20 @@ h1 {
 
 .doc-icon,
 .doc-menu {
+    color: inherit;
     font-size: 1.35rem;
     text-align: center;
+    text-decoration: none;
 }
 
 .workspace-content {
     display: grid;
     gap: 24px;
     padding: 32px;
+}
+
+.workspace-content-blank {
+    background: var(--bg);
 }
 
 .editor-card,

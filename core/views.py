@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import EmailLoginForm, ResumeSectionForm, SignupForm
-from .models import Bullet, ResumeSection
+from .models import ResumeSection
 
 
 def bullet_list(request):
@@ -26,12 +26,8 @@ def repository_view(request, section_id=None):
     elif sections:
         active_section = sections[0]
 
-    form = ResumeSectionForm(instance=active_section)
-    bullets = Bullet.objects.all()
     return render(request, 'repository.html', {
         'active_section': active_section,
-        'bullets': bullets,
-        'form': form,
         'sections': sections,
     })
 
@@ -51,12 +47,21 @@ def add_section(request):
 def update_section(request, section_id):
     section = get_object_or_404(ResumeSection, pk=section_id, user=request.user)
     if request.method == 'POST':
-        form = ResumeSectionForm(request.POST, instance=section)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Section updated.')
+        if 'notes' not in request.POST:
+            new_name = request.POST.get('name', '').strip()
+            if new_name:
+                section.name = new_name
+                section.save(update_fields=['name', 'updated_at'])
+                messages.success(request, 'Section renamed.')
+            else:
+                messages.error(request, 'Section name cannot be blank.')
         else:
-            messages.error(request, 'Please check the section details.')
+            form = ResumeSectionForm(request.POST, instance=section)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Section updated.')
+            else:
+                messages.error(request, 'Please check the section details.')
     return redirect('repository_section', section_id=section.id)
 
 

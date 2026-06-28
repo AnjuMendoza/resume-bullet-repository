@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}Your Bullet Repository{% endblock %}
 {% block content %}
-<section class="workspace-shell">
-    <aside class="document-tabs" aria-label="Resume document tabs">
+<section class="workspace-shell" data-workspace-shell>
+    <aside class="document-tabs" aria-label="Resume sections">
         <div class="tabs-topline">
             <a class="back-link" href="{% url 'bullet_list' %}" aria-label="Back to home">←</a>
             <form method="post" action="{% url 'add_section' %}" class="add-tab-form">
@@ -10,69 +10,90 @@
                 <input type="hidden" name="name" value="Untitled section" />
                 <button type="submit" class="icon-button" aria-label="Add section">+</button>
             </form>
+            <button type="button" class="collapse-tabs-button" aria-label="Collapse sections" aria-expanded="true" data-toggle-sections>‹</button>
         </div>
         <div class="tabs-heading-row">
-            <h2>Document tabs</h2>
+            <h2>Sections</h2>
         </div>
         <nav class="tab-list">
             {% for section in sections %}
-                <a class="doc-tab {% if active_section.id == section.id %}active{% endif %}" href="{% url 'repository_section' section.id %}">
-                    <span class="doc-icon" aria-hidden="true">▤</span>
-                    <span class="doc-title">{{ section.name }}</span>
-                    <span class="doc-menu" aria-hidden="true">⋮</span>
-                </a>
+                <div class="doc-tab {% if active_section.id == section.id %}active{% endif %}">
+                    <a class="doc-icon" href="{% url 'repository_section' section.id %}" aria-label="Open {{ section.name }}">▤</a>
+                    <form method="post" action="{% url 'update_section' section.id %}" class="rename-section-form">
+                        {% csrf_token %}
+                        <input
+                            class="doc-title-input"
+                            name="name"
+                            value="{{ section.name }}"
+                            aria-label="Section name"
+                            readonly
+                            data-original-value="{{ section.name }}"
+                        />
+                    </form>
+                    <a class="doc-menu" href="{% url 'repository_section' section.id %}" aria-label="Open {{ section.name }}">⋮</a>
+                </div>
             {% endfor %}
         </nav>
     </aside>
 
-    <div class="workspace-content">
-        <section class="editor-card">
-            <div class="editor-header">
-                <div>
-                    <span class="eyebrow">Section editor</span>
-                    <h1>{{ active_section.name }}</h1>
-                    <p class="subtext">Add, remove, rename, and edit individual resume sections from the side column.</p>
-                </div>
-                {% if active_section %}
-                    <form method="post" action="{% url 'delete_section' active_section.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="danger-button">Remove section</button>
-                    </form>
-                {% endif %}
-            </div>
-
-            {% if active_section %}
-                <form method="post" action="{% url 'update_section' active_section.id %}" class="section-editor-form">
-                    {% csrf_token %}
-                    <label for="{{ form.name.id_for_label }}">Section name</label>
-                    {{ form.name }}
-                    <label for="{{ form.notes.id_for_label }}">Section properties and notes</label>
-                    {{ form.notes }}
-                    <button type="submit" class="btn">Save section</button>
-                </form>
-            {% endif %}
-        </section>
-
-        <section class="repository-panel" id="bullets">
-            <div class="panel-heading">
-                <div>
-                    <span class="eyebrow">Separate page</span>
-                    <h2>Your bullet repository</h2>
-                </div>
-            </div>
-            {% if bullets %}
-                <ul class="bullet-list">
-                    {% for bullet in bullets %}
-                        <li class="bullet-item">
-                            <div class="meta">{{ bullet.get_main_category_display }} • {{ bullet.sub_category }}</div>
-                            <div>{{ bullet.text }}</div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="empty">No bullets yet. Your best resume accomplishments will live here.</p>
-            {% endif %}
-        </section>
-    </div>
+    <div class="workspace-content workspace-content-blank" aria-label="Blank workspace"></div>
 </section>
+<script>
+    (() => {
+        const shell = document.querySelector('[data-workspace-shell]');
+        const toggle = document.querySelector('[data-toggle-sections]');
+
+        if (shell && toggle) {
+            toggle.addEventListener('click', () => {
+                const isCollapsed = shell.classList.toggle('sections-collapsed');
+                toggle.setAttribute('aria-expanded', String(!isCollapsed));
+                toggle.setAttribute('aria-label', isCollapsed ? 'Expand sections' : 'Collapse sections');
+                toggle.textContent = isCollapsed ? '›' : '‹';
+            });
+        }
+
+        document.querySelectorAll('.doc-title-input').forEach((input) => {
+            input.addEventListener('dblclick', () => {
+                input.readOnly = false;
+                input.focus();
+                input.select();
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    input.blur();
+                }
+
+                if (event.key === 'Escape') {
+                    input.value = input.dataset.originalValue || input.defaultValue;
+                    input.readOnly = true;
+                    input.blur();
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                if (input.readOnly) {
+                    return;
+                }
+
+                const nextValue = input.value.trim();
+                const originalValue = input.dataset.originalValue || input.defaultValue;
+
+                if (!nextValue) {
+                    input.value = originalValue;
+                    input.readOnly = true;
+                    return;
+                }
+
+                input.value = nextValue;
+                input.readOnly = true;
+
+                if (nextValue !== originalValue) {
+                    input.form.submit();
+                }
+            });
+        });
+    })();
+</script>
 {% endblock %}
